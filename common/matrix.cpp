@@ -4,7 +4,7 @@
 golovin::MatrixShape::MatrixShape():
   rows_(1),
   cols_(1),
-  array_(std::make_unique<shapePointer[]>(rows_ * cols_))
+  array_(std::make_unique<shapePointer[]>(1))
 {}
 
 golovin::MatrixShape::MatrixShape(const MatrixShape &src):
@@ -76,10 +76,20 @@ void golovin::MatrixShape::addShape(const shapePointer &shape)
     throw std::invalid_argument("Null pointer received");
   }
   size_t currRow = 0;
+  bool isPlace = false;
   for (size_t i = 0; i < rows_; ++i)
   {
-    for (size_t j = 0; (j < cols_) && (array_[i * cols_ + j]); ++j)
+    if (isPlace)
     {
+      break;
+    }
+    for (size_t j = 0; (j < cols_); ++j)
+    {
+      if (!(array_[i * cols_ + j]))
+      {
+        isPlace = true;
+        break;
+      }
       if (isOverlapped(array_[i * cols_ + j], shape))
       {
         ++currRow;

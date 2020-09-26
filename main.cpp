@@ -21,7 +21,6 @@ void printException(const std::exception& e, int level = 0)
   }
 }
 
-
 int main()
 {
   const int COUNT_OF_FIGURES = 4;
