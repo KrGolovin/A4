@@ -161,7 +161,7 @@ golovin::Layer golovin::MatrixShape::operator[](const size_t index) const
   {
     tmpArray[i] = array_[index * cols_ + i];
   }
-  return Layer(tmpArray, rows_);
+  return Layer(tmpArray, cols_);
 }
 
 void golovin::MatrixShape::print(std::ostream &out) const
@@ -179,4 +179,9 @@ void golovin::MatrixShape::print(std::ostream &out) const
     }
     out << "\n";
   }
+}
+
+size_t golovin::MatrixShape::getSize() const
+{
+  return rows_ * cols_;
 }

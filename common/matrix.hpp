@@ -33,6 +33,8 @@ namespace golovin
     void addShape(const shapePointer &);
 
     void print( std::ostream &) const;
+
+    size_t getSize() const;
   private:
     size_t rows_;
     size_t cols_;
