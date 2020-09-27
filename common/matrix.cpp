@@ -5,7 +5,9 @@ golovin::MatrixShape::MatrixShape():
   rows_(1),
   cols_(1),
   array_(std::make_unique<shapePointer[]>(1))
-{}
+{
+  array_[0] = nullptr;
+}
 
 golovin::MatrixShape::MatrixShape(const MatrixShape &src):
   rows_(src.rows_),
@@ -85,7 +87,7 @@ void golovin::MatrixShape::addShape(const shapePointer &shape)
     }
     for (size_t j = 0; (j < cols_); ++j)
     {
-      if (!(array_[i * cols_ + j]))
+      if (array_[i * cols_ + j] == nullptr)
       {
         isPlace = true;
         break;

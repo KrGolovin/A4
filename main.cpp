@@ -1,6 +1,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <exception>
+#include <string>
+#include<vector>
 #include "common/rectangle.hpp"
 #include "common/circle.hpp"
 #include "common/triangle.hpp"
@@ -80,11 +82,14 @@ int main()
   golovin::MatrixShape matrix(figures);
   matrix.print(std::cout);
 
-  golovin::Rectangle rectangle1({1.1, 2.2}, 4.0, 2.0);
-  golovin::Rectangle rectangle2({12.1, 12.2}, 4.10, 2.0);
+//  std::shared_ptr<std::vector<int*>> a(std::make_shared<std::vector<int*>>(3, nullptr));
+//  int x1 = 1;
+//  int x2 = 2;
+//  int x3 = 3;
+//  (*a)[0] = &x1;
   golovin::MatrixShape matrix2;
-  matrix.addShape(std::make_shared<golovin::Rectangle>(rectangle1));
-  matrix.addShape(std::make_shared<golovin::Rectangle>(rectangle2));
+  matrix2.addShape(std::make_shared<golovin::Rectangle>(golovin::point_t{1.1, 2.2}, 4.0, 2.0));
+  matrix2.addShape(std::make_shared<golovin::Rectangle>(golovin::point_t{120.1, 120.2}, 4.10, 2.0));
   std::cout << matrix2[0][1]->getArea();
 
 
