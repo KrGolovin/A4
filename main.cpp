@@ -1,6 +1,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <exception>
+#include <string>
+#include<vector>
 #include "common/rectangle.hpp"
 #include "common/circle.hpp"
 #include "common/triangle.hpp"
@@ -20,7 +22,6 @@ void printException(const std::exception& e, int level = 0)
     printException(e, level+1);
   }
 }
-
 
 int main()
 {
@@ -80,6 +81,18 @@ int main()
   figures[0]->move({100, 100});
   golovin::MatrixShape matrix(figures);
   matrix.print(std::cout);
+
+//  std::shared_ptr<std::vector<int*>> a(std::make_shared<std::vector<int*>>(3, nullptr));
+//  int x1 = 1;
+//  int x2 = 2;
+//  int x3 = 3;
+//  (*a)[0] = &x1;
+  golovin::MatrixShape matrix2;
+  matrix2.addShape(std::make_shared<golovin::Rectangle>(golovin::point_t{1.1, 2.2}, 4.0, 2.0));
+  matrix2.addShape(std::make_shared<golovin::Rectangle>(golovin::point_t{120.1, 120.2}, 4.10, 2.0));
+  std::cout << matrix2[0][1]->getArea();
+
+
 
   figures.popBack();
   std::cout << ((figures.isEmpty()) ? "Is empty" : "Isn't empty") << '\n';

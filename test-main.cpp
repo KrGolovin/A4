@@ -43,8 +43,8 @@ BOOST_AUTO_TEST_SUITE(TestRectangle)
     golovin::Rectangle rectangle(basePoint, width, height);
     rectangle.move(endPoint);
 
-    BOOST_CHECK_CLOSE(rectangle.getPos().x, endPoint.x, ACCURACY);
-    BOOST_CHECK_CLOSE(rectangle.getPos().y, endPoint.y, ACCURACY);
+    BOOST_CHECK_CLOSE_FRACTION(rectangle.getPos().x, endPoint.x, ACCURACY);
+    BOOST_CHECK_CLOSE_FRACTION(rectangle.getPos().y, endPoint.y, ACCURACY);
   }
 
   BOOST_AUTO_TEST_CASE(TestMovingByOffset)
@@ -1165,16 +1165,18 @@ BOOST_AUTO_TEST_SUITE(TestPolygon)
 
   BOOST_AUTO_TEST_CASE(TestInvarianceOfAreaAfterMovingInPoint)
   {
-    const golovin::point_t pointA{0.0, 0.0};
-    const golovin::point_t pointB{1.0, 1.0};
-    const golovin::point_t pointC{0.0, 2.0};
-    const golovin::point_t endPoint{10.0, -10.0};
+    const golovin::point_t pointA{-1, 1};
+    const golovin::point_t pointB{2.0, 5.0};
+    const golovin::point_t pointC{5.0, 4.0};
+    const golovin::point_t pointD{4.0, 2.0};
+    const golovin::point_t endPoint{1.0, 1.0};
 
-    golovin::Triangle triangle(pointA, pointB, pointC);
-    double area = triangle.getArea();
-    triangle.move(endPoint);
+    golovin::point_t points[] = {pointA, pointB, pointC, pointD};
+    golovin::Polygon polygon(points, 4);
+    double area = polygon.getArea();
+    polygon.move(endPoint);
 
-    BOOST_CHECK_CLOSE(triangle.getArea(), area, ACCURACY);
+    BOOST_CHECK_CLOSE(polygon.getArea(), area, ACCURACY);
   }
 
   BOOST_AUTO_TEST_CASE(TestInvarianceOfAreaAfterMovingByOffset)
@@ -1270,48 +1272,36 @@ BOOST_AUTO_TEST_SUITE(MatrixShapeTest)
     BOOST_CHECK_CLOSE(matrix[0][0]->getArea(), rectangle.getArea(), ACCURACY);
   }
 
-  BOOST_AUTO_TEST_CASE(MatrixShapeDoNewLine)
+  BOOST_AUTO_TEST_CASE(MatrixShapeConstructor)
   {
-    golovin::Rectangle rectangle({1.1, 2.0}, 4, 2);
-    golovin::Triangle triangle({1.1, 1.1 }, {2.2, 5.1}, {10.2, 3.2});
+    golovin::Rectangle rectangle({1.1, 2.2}, 4.0, 2.0);
+    golovin::Rectangle rectangle1({12.1, 12.2}, 4.10, 2.0);
     golovin::MatrixShape matrix;
     matrix.addShape(std::make_shared<golovin::Rectangle>(rectangle));
-    matrix.addShape(std::make_shared<golovin::Triangle>(triangle));
-    BOOST_CHECK_CLOSE(matrix[1][0]->getArea(), triangle.getArea(), ACCURACY);
+    matrix.addShape(std::make_shared<golovin::Rectangle>(rectangle1));
+    BOOST_CHECK_CLOSE(matrix[0][1]->getArea(), rectangle.getArea(), ACCURACY);
   }
 
-  BOOST_AUTO_TEST_CASE(MatrixShapeDoNewColumns)
+  BOOST_AUTO_TEST_CASE(MatrixShapeCopyConstructor)
   {
-    golovin::Rectangle rectangle({6.2, 3.1}, 4.2, 2.1);
-    golovin::Triangle
-    golovin::Polygon pol(points, 4);
-    golovin::MatrixShape mat(&rect);
-    mat.addShape(&tri);
-    mat.addShape(&pol);
-    BOOST_CHECK(mat[1][1] == &pol);
+    golovin::Rectangle rectangle({1.1, 2.2}, 4.0, 2.0);
+    golovin::MatrixShape matrix;
+    matrix.addShape(std::make_shared<golovin::Rectangle>(rectangle));
+    golovin::MatrixShape copyMatrix(matrix);
+    BOOST_CHECK_CLOSE(matrix[0][0]->getFrameRect().pos.x, copyMatrix[0][0]->getFrameRect().pos.x, ACCURACY);
+    BOOST_CHECK_CLOSE(matrix[0][0]->getFrameRect().pos.y, copyMatrix[0][0]->getFrameRect().pos.y, ACCURACY);
   }
 
-
-  BOOST_AUTO_TEST_CASE(matrixshape_new_shape)
+  BOOST_AUTO_TEST_CASE(MatrixShapeMoveConstructor)
   {
-    Rectangle rect({ 6,3 }, 4, 2);
-    Circle cir({ -10,-5 }, 1);
-    Triangle tri({ 7, 1 }, { 7, 5 }, { 10, 3 });
-    point_t points[] = { { 2,1 },{ 2,5 },{ 6,6 },{ 4,1 } };
-    Polygon pol(points, 4);
-    MatrixShape mat(&rect);
-    mat.addShape(&tri);
-    mat.addShape(&pol);
-    mat.addShape(&cir);
-    BOOST_CHECK(mat[0][1] == &cir);
+    golovin::Rectangle rectangle({1.1, 2.2}, 4.0, 2.0);
+    golovin::MatrixShape matrix;
+    matrix.addShape(std::make_shared<golovin::Rectangle>(rectangle));
+    double ansX = matrix[0][0]->getFrameRect().pos.x;
+    double ansY = matrix[0][0]->getFrameRect().pos.y;
+    golovin::MatrixShape copyMatrix(std::move(matrix));
+    BOOST_CHECK_CLOSE(ansX, copyMatrix[0][0]->getFrameRect().pos.x, ACCURACY);
+    BOOST_CHECK_CLOSE(ansY, copyMatrix[0][0]->getFrameRect().pos.y, ACCURACY);
   }
+BOOST_AUTO_TEST_SUITE_END()
 
-  BOOST_AUTO_TEST_CASE(matrixshape_composite)
-  {
-    auto rect = std::make_shared<Rectangle>(point_t{ 6,3 }, 4, 2);
-    auto cir = std::make_shared<Circle>(point_t{ 3,3 }, 1);
-    CompositeShape comp(rect);
-    comp.addShape(cir);
-    MatrixShape mat(&comp);
-    BOOST_CHECK(&comp == mat[0][0]);
-  }
