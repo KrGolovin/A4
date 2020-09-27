@@ -1424,17 +1424,74 @@ BOOST_AUTO_TEST_SUITE(LayerTest)
     tmpArray[2] = std::make_shared<golovin::Triangle>(pointA, pointB, pointC);
 
 
-    golovin::Layer layer(tmpArray);
+    golovin::Layer layer(tmpArray, 3);
+    golovin::Layer copyLayer = layer;
+
+    BOOST_CHECK_CLOSE(layer[0]->getFrameRect().pos.x, copyLayer[0]->getFrameRect().pos.x, ACCURACY);
+    BOOST_CHECK_CLOSE(layer[0]->getFrameRect().pos.y, copyLayer[0]->getFrameRect().pos.y, ACCURACY);
+    BOOST_CHECK_CLOSE(layer[0]->getFrameRect().width, copyLayer[0]->getFrameRect().width, ACCURACY);
+    BOOST_CHECK_CLOSE(layer[0]->getFrameRect().height, copyLayer[0]->getFrameRect().height, ACCURACY);
+  }
+
+  BOOST_AUTO_TEST_CASE(TestLayerMoveAssigmentOperator)
+  {
+    const golovin::point_t basePointOfRectangle{0.0, 0.0};
+    const double width = 5.0;
+    const double height = 10.0;
+
+    const golovin::point_t basePointOfCircle{1.1, 1.1};
+    const double radius = 5.0;
+
+    const golovin::point_t pointA{0.0, 0.0};
+    const golovin::point_t pointB{1.0, 1.0};
+    const golovin::point_t pointC{0.0, 2.0};
+
+    golovin::CompositeShape::shapeArray tmpArray(std::make_unique<golovin::CompositeShape::shapePointer[]>(3));
+    tmpArray[0] = std::make_shared<golovin::Rectangle>(basePointOfRectangle, width, height);
+    tmpArray[1] = std::make_shared<golovin::Circle>(basePointOfCircle, radius);
+    tmpArray[2] = std::make_shared<golovin::Triangle>(pointA, pointB, pointC);
+
+
+    golovin::Layer layer(tmpArray, 3);
+    golovin::rectangle_t rect = layer[0]->getFrameRect();
+    golovin::Layer moveLayer = std::move(layer);
+
+    BOOST_CHECK_CLOSE(moveLayer[0]->getFrameRect().pos.x, rect.pos.x, ACCURACY);
+    BOOST_CHECK_CLOSE(moveLayer[0]->getFrameRect().pos.y, rect.pos.y, ACCURACY);
+    BOOST_CHECK_CLOSE(moveLayer[0]->getFrameRect().width, rect.width, ACCURACY);
+    BOOST_CHECK_CLOSE(moveLayer[0]->getFrameRect().height, rect.height, ACCURACY);
+    BOOST_CHECK_EQUAL(layer.getSize(), 0);
+  }
+
+  BOOST_AUTO_TEST_CASE(TestLayerCopyConstructor)
+  {
+    const golovin::point_t basePointOfRectangle{0.0, 0.0};
+    const double width = 5.0;
+    const double height = 10.0;
+
+    const golovin::point_t basePointOfCircle{1.1, 1.1};
+    const double radius = 5.0;
+
+    const golovin::point_t pointA{0.0, 0.0};
+    const golovin::point_t pointB{1.0, 1.0};
+    const golovin::point_t pointC{0.0, 2.0};
+
+    golovin::CompositeShape::shapeArray tmpArray(std::make_unique<golovin::CompositeShape::shapePointer[]>(3));
+    tmpArray[0] = std::make_shared<golovin::Rectangle>(basePointOfRectangle, width, height);
+    tmpArray[1] = std::make_shared<golovin::Circle>(basePointOfCircle, radius);
+    tmpArray[2] = std::make_shared<golovin::Triangle>(pointA, pointB, pointC);
+
+
+    golovin::Layer layer(tmpArray, 3);
     golovin::Layer copyLayer(layer);
 
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.pos.x, copyCompositeShapeFrameRect.pos.x, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.pos.y, copyCompositeShapeFrameRect.pos.y, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.width, copyCompositeShapeFrameRect.width, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.height, copyCompositeShapeFrameRect.height, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeArea, copyCompositeShapeArea, ACCURACY);
+    BOOST_CHECK_CLOSE(layer[0]->getFrameRect().pos.x, copyLayer[0]->getFrameRect().pos.x, ACCURACY);
+    BOOST_CHECK_CLOSE(layer[0]->getFrameRect().pos.y, copyLayer[0]->getFrameRect().pos.y, ACCURACY);
+    BOOST_CHECK_CLOSE(layer[0]->getFrameRect().width, copyLayer[0]->getFrameRect().width, ACCURACY);
+    BOOST_CHECK_CLOSE(layer[0]->getFrameRect().height, copyLayer[0]->getFrameRect().height, ACCURACY);
   }
 
-  BOOST_AUTO_TEST_CASE(TestCompositeShapeMoveAssigmentOperator)
+  BOOST_AUTO_TEST_CASE(TestLayerMoveConstructor)
   {
     const golovin::point_t basePointOfRectangle{0.0, 0.0};
     const double width = 5.0;
@@ -1447,105 +1504,20 @@ BOOST_AUTO_TEST_SUITE(LayerTest)
     const golovin::point_t pointB{1.0, 1.0};
     const golovin::point_t pointC{0.0, 2.0};
 
-    golovin::CompositeShape::shapePointer rectangle =
-            std::make_shared<golovin::Rectangle>(basePointOfRectangle, width, height);
-    golovin::CompositeShape::shapePointer circle =
-            std::make_shared<golovin::Circle>(basePointOfCircle, radius);
-    golovin::CompositeShape::shapePointer triangle =
-            std::make_shared<golovin::Triangle>(pointA, pointB, pointC);
-    golovin::CompositeShape compositeShape;
-    compositeShape.pushBack(rectangle);
-    compositeShape.pushBack(circle);
-    compositeShape.pushBack(triangle);
+    golovin::CompositeShape::shapeArray tmpArray(std::make_unique<golovin::CompositeShape::shapePointer[]>(3));
+    tmpArray[0] = std::make_shared<golovin::Rectangle>(basePointOfRectangle, width, height);
+    tmpArray[1] = std::make_shared<golovin::Circle>(basePointOfCircle, radius);
+    tmpArray[2] = std::make_shared<golovin::Triangle>(pointA, pointB, pointC);
 
-    golovin::rectangle_t compositeShapeFrameRect = compositeShape.getFrameRect();
-    double compositeShapeArea = compositeShape.getArea();
 
-    golovin::CompositeShape newCompositeShape = std::move(compositeShape);
+    golovin::Layer layer(tmpArray, 3);
+    golovin::rectangle_t rect = layer[0]->getFrameRect();
+    golovin::Layer moveLayer(std::move(layer));
 
-    golovin::rectangle_t newCompositeShapeFrameRect = newCompositeShape.getFrameRect();
-    double newCompositeShapeArea = newCompositeShape.getArea();
-
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.pos.x, newCompositeShapeFrameRect.pos.x, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.pos.y, newCompositeShapeFrameRect.pos.y, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.width, newCompositeShapeFrameRect.width, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.height, newCompositeShapeFrameRect.height, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeArea, newCompositeShapeArea, ACCURACY);
+    BOOST_CHECK_CLOSE(moveLayer[0]->getFrameRect().pos.x, rect.pos.x, ACCURACY);
+    BOOST_CHECK_CLOSE(moveLayer[0]->getFrameRect().pos.y, rect.pos.y, ACCURACY);
+    BOOST_CHECK_CLOSE(moveLayer[0]->getFrameRect().width, rect.width, ACCURACY);
+    BOOST_CHECK_CLOSE(moveLayer[0]->getFrameRect().height, rect.height, ACCURACY);
+    BOOST_CHECK_EQUAL(layer.getSize(), 0);
   }
-
-  BOOST_AUTO_TEST_CASE(TestCompositeShapeCopyConstructor)
-  {
-    const golovin::point_t basePointOfRectangle{0.0, 0.0};
-    const double width = 5.0;
-    const double height = 10.0;
-
-    const golovin::point_t basePointOfCircle{1.1, 1.1};
-    const double radius = 5.0;
-
-    const golovin::point_t pointA{0.0, 0.0};
-    const golovin::point_t pointB{1.0, 1.0};
-    const golovin::point_t pointC{0.0, 2.0};
-
-    golovin::CompositeShape::shapePointer rectangle =
-            std::make_shared<golovin::Rectangle>(basePointOfRectangle, width, height);
-    golovin::CompositeShape::shapePointer circle =
-            std::make_shared<golovin::Circle>(basePointOfCircle, radius);
-    golovin::CompositeShape::shapePointer triangle =
-            std::make_shared<golovin::Triangle>(pointA, pointB, pointC);
-    golovin::CompositeShape compositeShape;
-    compositeShape.pushBack(rectangle);
-    compositeShape.pushBack(circle);
-    compositeShape.pushBack(triangle);
-
-    golovin::CompositeShape copyCompositeShape(compositeShape);
-    golovin::rectangle_t compositeShapeFrameRect = compositeShape.getFrameRect();
-    golovin::rectangle_t copyCompositeShapeFrameRect = copyCompositeShape.getFrameRect();
-    double compositeShapeArea = compositeShape.getArea();
-    double copyCompositeShapeArea = copyCompositeShape.getArea();
-
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.pos.x, copyCompositeShapeFrameRect.pos.x, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.pos.y, copyCompositeShapeFrameRect.pos.y, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.width, copyCompositeShapeFrameRect.width, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.height, copyCompositeShapeFrameRect.height, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeArea, copyCompositeShapeArea, ACCURACY);
-  }
-
-  BOOST_AUTO_TEST_CASE(TestCompositeShapeMoveConstructor)
-  {
-    const golovin::point_t basePointOfRectangle{0.0, 0.0};
-    const double width = 5.0;
-    const double height = 10.0;
-
-    const golovin::point_t basePointOfCircle{1.1, 1.1};
-    const double radius = 5.0;
-
-    const golovin::point_t pointA{0.0, 0.0};
-    const golovin::point_t pointB{1.0, 1.0};
-    const golovin::point_t pointC{0.0, 2.0};
-
-    golovin::CompositeShape::shapePointer rectangle =
-            std::make_shared<golovin::Rectangle>(basePointOfRectangle, width, height);
-    golovin::CompositeShape::shapePointer circle =
-            std::make_shared<golovin::Circle>(basePointOfCircle, radius);
-    golovin::CompositeShape::shapePointer triangle =
-            std::make_shared<golovin::Triangle>(pointA, pointB, pointC);
-    golovin::CompositeShape compositeShape;
-    compositeShape.pushBack(rectangle);
-    compositeShape.pushBack(circle);
-    compositeShape.pushBack(triangle);
-
-    golovin::rectangle_t compositeShapeFrameRect = compositeShape.getFrameRect();
-    double compositeShapeArea = compositeShape.getArea();
-
-    golovin::CompositeShape newCompositeShape(std::move(compositeShape));
-
-    golovin::rectangle_t newCompositeShapeFrameRect = newCompositeShape.getFrameRect();
-    double newCompositeShapeArea = newCompositeShape.getArea();
-
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.pos.x, newCompositeShapeFrameRect.pos.x, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.pos.y, newCompositeShapeFrameRect.pos.y, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.width, newCompositeShapeFrameRect.width, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeFrameRect.height, newCompositeShapeFrameRect.height, ACCURACY);
-    BOOST_CHECK_CLOSE(compositeShapeArea, newCompositeShapeArea, ACCURACY);
-  }
-
+BOOST_AUTO_TEST_SUITE_END()
