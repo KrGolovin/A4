@@ -1272,25 +1272,36 @@ BOOST_AUTO_TEST_SUITE(MatrixShapeTest)
     BOOST_CHECK_CLOSE(matrix[0][0]->getArea(), rectangle.getArea(), ACCURACY);
   }
 
-  BOOST_AUTO_TEST_CASE(MatrixShapeDoNewLine)
+  BOOST_AUTO_TEST_CASE(MatrixShapeConstructor)
   {
-    golovin::Rectangle rectangle({1.1, 2.0}, 4, 2);
-    golovin::Triangle triangle({1.1, 1.1}, {6.2, 5.1}, {10.2, 3.2});
+    golovin::Rectangle rectangle({1.1, 2.2}, 4.0, 2.0);
+    golovin::Rectangle rectangle1({12.1, 12.2}, 4.10, 2.0);
     golovin::MatrixShape matrix;
     matrix.addShape(std::make_shared<golovin::Rectangle>(rectangle));
-    matrix.addShape(std::make_shared<golovin::Triangle>(triangle));
-    BOOST_CHECK_CLOSE(matrix[1][0]->getArea(), triangle.getArea(), ACCURACY);
+    matrix.addShape(std::make_shared<golovin::Rectangle>(rectangle1));
+    BOOST_CHECK_CLOSE(matrix[0][1]->getArea(), rectangle.getArea(), ACCURACY);
   }
 
-  BOOST_AUTO_TEST_CASE(MatrixShapeDoNewColumns)
+  BOOST_AUTO_TEST_CASE(MatrixShapeCopyConstructor)
   {
-    golovin::Rectangle rectangle({6.2, 3.1}, 4.2, 2.1);
-    golovin::Circle circle({20.0, 20.0}, 1);
+    golovin::Rectangle rectangle({1.1, 2.2}, 4.0, 2.0);
     golovin::MatrixShape matrix;
-    matrix.addShape(std::make_shared<golovin::Rectangle>(golovin::point_t{6.2, 3.1}, 4.2, 2.1));
-    matrix.addShape(std::make_shared<golovin::Circle>(golovin::point_t{20.0, 20.0}, 1));
-    BOOST_CHECK_CLOSE(matrix[0][1]->getArea(), circle.getArea(), ACCURACY);
+    matrix.addShape(std::make_shared<golovin::Rectangle>(rectangle));
+    golovin::MatrixShape copyMatrix(matrix);
+    BOOST_CHECK_CLOSE(matrix[0][0]->getFrameRect().pos.x, copyMatrix[0][0]->getFrameRect().pos.x, ACCURACY);
+    BOOST_CHECK_CLOSE(matrix[0][0]->getFrameRect().pos.y, copyMatrix[0][0]->getFrameRect().pos.y, ACCURACY);
   }
 
+  BOOST_AUTO_TEST_CASE(MatrixShapeMoveConstructor)
+  {
+    golovin::Rectangle rectangle({1.1, 2.2}, 4.0, 2.0);
+    golovin::MatrixShape matrix;
+    matrix.addShape(std::make_shared<golovin::Rectangle>(rectangle));
+    double ansX = matrix[0][0]->getFrameRect().pos.x;
+    double ansY = matrix[0][0]->getFrameRect().pos.y;
+    golovin::MatrixShape copyMatrix(std::move(matrix));
+    BOOST_CHECK_CLOSE(ansX, copyMatrix[0][0]->getFrameRect().pos.x, ACCURACY);
+    BOOST_CHECK_CLOSE(ansY, copyMatrix[0][0]->getFrameRect().pos.y, ACCURACY);
+  }
 BOOST_AUTO_TEST_SUITE_END()
 

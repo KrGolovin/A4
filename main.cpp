@@ -80,6 +80,15 @@ int main()
   golovin::MatrixShape matrix(figures);
   matrix.print(std::cout);
 
+  golovin::Rectangle rectangle1({1.1, 2.2}, 4.0, 2.0);
+  golovin::Rectangle rectangle2({12.1, 12.2}, 4.10, 2.0);
+  golovin::MatrixShape matrix2;
+  matrix.addShape(std::make_shared<golovin::Rectangle>(rectangle1));
+  matrix.addShape(std::make_shared<golovin::Rectangle>(rectangle2));
+  std::cout << matrix2[0][1]->getArea();
+
+
+
   figures.popBack();
   std::cout << ((figures.isEmpty()) ? "Is empty" : "Isn't empty") << '\n';
   figures.popBack();
